@@ -6,6 +6,8 @@ package studentmanagementsystem;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * StudentManagementSystem handles all of the system's operations
@@ -24,6 +26,79 @@ public class StudentManagementSystem {
     // LinkedHashMap is a HashMap that also remembers the order
     // students were added, so lists come out in a sensible order.
     private final Map<String, Student> students = new LinkedHashMap<>();
+    
+    // --------- Core operations: add, find, update, remove ---------
+    
+    // Adds a new student. Throws an error if the ID is blank or
+    // already used, or if the name is invalid.
+    public void addStudent(Student student) {
+        if (student == null) {
+            throw new IllegalArgumentException("No student was given to add.");
+        }
+        String id = cleanId(student.getId());
+        requireSafeText(student.getName(), "Name");
+        
+        if (students.containsKey(id)) {
+            throw new IllegalArgumentException("A student with ID " + id + " already exists.");
+        }
+        students.put(id, student);
+    }
+    
+     // Looks up a student by ID. Returns null if there's no match.
+    public Student findStudent(String id) {
+        if (id == null) {
+            return null;
+        }
+        return students.get(id.trim());
+    }
+    
+    // Change a student's name
+    public void updateStudentName(String id, String newName) {
+        Student student = getExistingStudent(id);
+        requireSafeText(newName, "Name");
+        student.setName(newName.trim());
+    }
+    
+    // Adds a grade for a subject, or changes it if the student
+    // already has that subject
+    public void setGrade(String id, String subjectName, double grade) {
+        Student student = getExistingStudent(id);
+        requireSafeText(subjectName, "Subject");
+        validateGrade(grade);
+        
+        Subject existing = student.getSubject(subjectName.trim());
+        if (existing != null) {
+            existing.setGrade(grade);
+        } else {
+            student.addSubject(new Subject(subjectName.trim(), grade));
+        }
+    }
+    
+    // Removes a student and returns the one that was removed
+    public Student removeStudent(String id) {
+        Student student = getExistingStudent(id);
+        students.remove(id.trim());
+        return student;
+    }
+    
+    // Returns a copy of the list of all students (the reports use this)
+    public List<Student> getAllStudents() {
+        return new ArrayList<>(students.values());
+    }
+    
+    // Returns how many students are in the system
+    public int getStudentCount() {
+        return students.size();
+    }
+    
+    // Finds a student or throws a friendly error if they don't exist
+    private Student getExistingStudent(String id) {
+        Student student = findStudent(id);
+        if (student == null) {
+            throw new IllegalArgumentException("No student found with ID " + id +".");
+        }
+        return student;
+    }
     
     // --------- Rules for checking input ---------
     
