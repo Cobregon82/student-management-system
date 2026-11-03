@@ -8,6 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * StudentManagementSystem handles all of the system's operations
@@ -98,6 +101,47 @@ public class StudentManagementSystem {
             throw new IllegalArgumentException("No student found with ID " + id +".");
         }
         return student;
+    }
+    
+    // --------- Saving to a file ---------
+    
+    // Saves every student to a text file, one student per line.
+    // File errors are caught here, so the program keeps running.
+    // Returns true if the save worked, false if it failed.
+    public boolean saveToFile(String fileName) {
+        // try-with-resources: Java closes the file automatically,
+        // even if an error happens partway through
+        try (PrintWriter out = new PrintWriter(new FileWriter(fileName))) {
+            for (Student student : students.values()) {
+                out.println(toFileLine(student));
+            }
+            System.out.println("Saved " + students.size() + " student(s) to " + fileName + ".");
+            return true;
+        } catch (IOException e) {
+              System.out.println("Could not save to " + fileName + ": " + e.getMessage());
+              return false;
+                    
+        }
+    }
+    
+    // Turns one student into one line of the save file, like:
+    // U,1001,Carmen Obregon,Math:92.5;English:90.0
+    private String toFileLine(Student student) {
+        String type;
+        if (student instanceof GradStudent) {
+            type = "G";
+        } else {
+            type = "U";
+        }
+        
+        StringBuilder grades = new StringBuilder();
+        for (Subject subject : student.getSubjects()) {
+            if (grades.length() > 0) {
+                grades.append(";");
+            }
+            grades.append(subject.getName()).append(":").append(subject.getGrade());
+        }
+        return type + "," + student.getId() + "," + student.getName() + "," + grades;
     }
     
     // --------- Rules for checking input ---------
