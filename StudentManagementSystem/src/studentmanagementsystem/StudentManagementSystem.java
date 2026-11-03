@@ -21,26 +21,34 @@ public class StudentManagementSystem {
     private static final String FORBIDDEN_CHARACTERS = ",;:";
     
     // All students looked up by their ID.
-    // LinkedHashMap is a HashMap that also remebers the order
+    // LinkedHashMap is a HashMap that also remembers the order
     // students were added, so lists come out in a sensible order.
-    private final Map<String, Student> stents = new LinkedHashMap<>();
+    private final Map<String, Student> students = new LinkedHashMap<>();
     
     // --------- Rules for checking input ---------
     
     // Makes sure a grade is between 0 and 100
+    static void validateGrade(double grade) {
+        if (grade < 0 || grade > 100) {
+            throw new IllegalArgumentException(
+                    "Grade must be between 0 and 100. You entered " + grade +".");
+        }
+    }
+    
+    // Makes sure text isn't blank and doesn't contain , ; or :
     static void requireSafeText(String text, String fieldName) {
         if (text == null || text.trim(). isEmpty()) {
-            throw new IllegalArgumentException (fieldName + "cannot be blank.");
+            throw new IllegalArgumentException (fieldName + " cannot be blank.");
         }
         for (char c : FORBIDDEN_CHARACTERS. toCharArray()) {
             if (text.indexOf(c) >= 0) {
                 throw new IllegalArgumentException (
-                        fieldName + "cannot contain a comma, semicolon, or colon.");
+                        fieldName + " cannot contain a comma, semicolon, or colon.");
             }
         }
     }
     
-    // Remves extra space from an ID and checks that it's valid
+    // Removes extra space from an ID and checks that it's valid
     private static String cleanId(String id) {
         requireSafeText(id, "Student ID");
         return id.trim();
