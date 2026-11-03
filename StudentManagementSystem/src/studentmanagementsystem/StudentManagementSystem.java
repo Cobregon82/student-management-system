@@ -11,6 +11,9 @@ import java.util.List;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 
 /**
  * StudentManagementSystem handles all of the system's operations
@@ -142,6 +145,102 @@ public class StudentManagementSystem {
             grades.append(subject.getName()).append(":").append(subject.getGrade());
         }
         return type + "," + student.getId() + "," + student.getName() + "," + grades;
+    }
+    
+    // --------- Loading from a file ---------
+    
+    // Loads students from a text file, replacing the students
+    // currently in the system. Lines that can't be read are skipped
+    // with a warning, so one bad line doesn't stop the rest.
+    // Returns true if the file was read, false if it was missing
+    // or couldn't be opened.
+    public boolean loadFromFile(String fileName) {
+        File file = new File(fileName);
+        if (!file.exists()) {
+            System.out.println("No saved file named " + fileName
+                    + " was found. Starting with an empty list.");
+            return false;
+        }
+        
+        // Put the students from the file in a temporary spot first
+        // That way if the file has a problem, we don't lose the students we already have. 
+        Map<String, Student> loaded = new LinkedHashMap<>();
+        int lineNumber = 0;
+        int skipped = 0;
+        
+        try (BufferedReader in = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = in.readLine()) != null) {
+                lineNumber++;
+                if (line.trim().isEmpty()) {
+                    continue;  // skip blank lines
+                }
+                try {
+                    Student student = parseFileLine(line);
+                    if (loaded.containsKey(student.getId())) {
+                        throw new IllegalArgumentException("duplicate ID " + student.getId());
+                    }
+                    loaded.put(student.getId(), student);
+                } catch (IllegalArgumentException e) {
+                    skipped++;
+                    System.out.println("Skipped line " + lineNumber + " (" + e.getMessage() + ")");
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Could not read " + fileName + ": " + e.getMessage());
+            return false;
+        }
+        
+        students.clear();
+        students.putAll(loaded);
+        System.out.println("Loaded " + loaded.size() + " student(s) from " + fileName
+                + " (" + skipped + " line(s) skipped).");
+                return true;
+            }
+    
+    // Turns one line of the save file back into a student.
+    // Throws an error if the line isn't in the right format.
+    private Student parseFileLine(String line) {
+        // The -1 keeps an empty last part, for a student with no grades
+        String[] parts = line.split(",", -1);
+        if (parts.length != 4) {
+            throw new IllegalArgumentException( 
+                    "expected 4 parts separated by commas, found " + parts.length);
+        }
+        String type = parts[0].trim();
+        String id = cleanId(parts[1]);
+        String name = parts[2].trim();
+        requireSafeText(name, "Name");
+        
+        Student student;
+        if (type.equals("U")) {
+            student = new UndergradStudent(id, name);
+        } else if (type.equals("G")) {
+            student = new GradStudent(id, name);
+        } else {
+            throw new IllegalArgumentException("unknown student type '" + type + "'");
+        }
+        
+        String gradesPart = parts[3].trim();
+        if (!gradesPart.isEmpty()) {
+            for (String entry : gradesPart.split(";")) {
+                String[] pair = entry.split(":");
+                if (pair.length != 2) {
+                    throw new IllegalArgumentException(
+                            "grade entry '" + entry + "' should look like Math:92.5");
+                }
+                double grade;
+                try {
+                    grade = Double.parseDouble(pair[1].trim());
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException(
+                            "grade '" + pair[1].trim() + "' is not a number");
+                }
+                validateGrade(grade);
+                student.addSubject(new Subject(pair[0].trim(), grade));
+            }
+        }
+        return student;
     }
     
     // --------- Rules for checking input ---------
