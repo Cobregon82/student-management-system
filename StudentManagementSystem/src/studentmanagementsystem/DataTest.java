@@ -21,7 +21,6 @@ public class DataTest {
         sms.addStudent(new GradStudent("2001", "Jessica Hernandez "));
         sms.addStudent(new UndergradStudent("1002", "Tara Cox"));
         System.out.println("Students in system: " + sms.getStudentCount());
-        
         System.out.println("\n--- Adding and updating grades ---");
         sms.setGrade("1001", "Math", 92.5);
         sms.setGrade("1001", "English", 90);
@@ -31,6 +30,8 @@ public class DataTest {
         System.out.println("Tara's Math grade: "
                 + sms.findStudent("1002").getSubject("Math").getGrade());
         
+Reports.showHighestAndLowest(sms);
+Reports.showStudentsSortedByGrade(sms);
         System.out.println("\n--- Updating a name ---");
         sms.updateStudentName("1002", "Tara Cox-Smith");
         System.out.println("Student 1002 is now: " + sms.findStudent("1002").getName());
