@@ -24,3 +24,5 @@ hs_err_pid*
 replay_pid*
 /StudentManagementSystem/nbproject/private/
 .DS_Store
+/StudentManagementSystem/build/
+StudentManagementSystem/test_students.txt
