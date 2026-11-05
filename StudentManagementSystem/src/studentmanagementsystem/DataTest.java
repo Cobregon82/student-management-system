@@ -32,7 +32,10 @@ public class DataTest {
         
 Reports.showHighestAndLowest(sms);
 Reports.showStudentsSortedByGrade(sms);
-        System.out.println("\n--- Updating a name ---");
+       
+Reports.showHighestAndLowest(sms, "Math");
+
+System.out.println("\n--- Updating a name ---");
         sms.updateStudentName("1002", "Tara Cox-Smith");
         System.out.println("Student 1002 is now: " + sms.findStudent("1002").getName());
                 

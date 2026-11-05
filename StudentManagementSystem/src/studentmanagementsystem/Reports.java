@@ -87,4 +87,50 @@ public class Reports {
     }
 
 
+// Report 4: Highest and lowest grades for a specific subject
+public static void showHighestAndLowest(
+        StudentManagementSystem system, String subjectName) {
+
+    Student highest = null;
+    Student lowest = null;
+    double highestGrade = 0;
+    double lowestGrade = 0;
+
+    for (Student student : system.getAllStudents()) {
+        Subject subject = student.getSubject(subjectName);
+
+        // Skip students who do not have this subject
+        if (subject == null) {
+            continue;
+        }
+
+        double grade = subject.getGrade();
+
+        if (highest == null || grade > highestGrade) {
+            highest = student;
+            highestGrade = grade;
+        }
+
+        if (lowest == null || grade < lowestGrade) {
+            lowest = student;
+            lowestGrade = grade;
+        }
+    }
+
+    System.out.println("\n--- HIGHEST AND LOWEST " 
+            + subjectName.toUpperCase() + " GRADES ---");
+
+    if (highest == null) {
+        System.out.println("No students found for this subject.");
+        return;
+    }
+
+    System.out.printf("Highest: %s | Grade: %.2f%n",
+            highest.getName(), highestGrade);
+
+    System.out.printf("Lowest: %s | Grade: %.2f%n",
+            lowest.getName(), lowestGrade);
+}
+
+    
 }
