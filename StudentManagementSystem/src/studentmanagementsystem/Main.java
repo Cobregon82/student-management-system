@@ -66,29 +66,111 @@ try {
     System.out.println("Error: " + e.getMessage());
 }    break;
 
-    case "2":
-        System.out.println("You chose to remove a student.");
-        break;
+  case "2":
+    System.out.print("Enter student ID to remove: ");
+    String removeId = scanner.nextLine();
 
-    case "3":
-        System.out.println("You chose to view students.");
-        break;
+    try {
+        Student removedStudent = system.removeStudent(removeId);
+        System.out.println("Student removed successfully: "
+                + removedStudent.getName());
+    } catch (IllegalArgumentException e) {
+        System.out.println("Error: " + e.getMessage());
+    }
+    break;
 
-    case "4":
-        System.out.println("You chose to add or update a grade.");
-        break;
+   case "3":
+    if (system.getAllStudents().isEmpty()) {
+        System.out.println("No students found.");
+    } else {
+        System.out.println("STUDENT LIST");
+
+        for (Student s : system.getAllStudents()) {
+            System.out.println("ID: " + s.getId()
+                    + " | Name: " + s.getName()
+                    + " | Average: " + s.getAverage());
+        }
+    }
+    break;
+
+   case "4":
+    System.out.print("Enter student ID: ");
+    String gradeId = scanner.nextLine();
+
+    System.out.print("Enter subject name: ");
+    String subjectName = scanner.nextLine();
+
+    System.out.print("Enter grade (0-100): ");
+    String gradeInput = scanner.nextLine();
+
+    try {
+        double grade = Double.parseDouble(gradeInput);
+
+        system.setGrade(gradeId, subjectName, grade);
+
+        System.out.println("Grade added or updated successfully!");
+
+    } catch (NumberFormatException e) {
+        System.out.println("Error: Please enter a valid number.");
+
+    } catch (IllegalArgumentException e) {
+        System.out.println("Error: " + e.getMessage());
+    }
+    break;
 
     case "5":
-        System.out.println("You chose to view reports.");
-        break;
+    System.out.println("STUDENT REPORTS");
+    System.out.println("1. Student Averages");
+    System.out.println("2. Highest and Lowest Averages");
+    System.out.println("3. Students Sorted by Grade");
+    System.out.println("4. Highest and Lowest Grades by Subject");
+    System.out.print("Choose a report: ");
+
+    String reportChoice = scanner.nextLine();
+
+    switch (reportChoice) {
+        case "1":
+            Reports.showStudentAverages(system);
+            break;
+
+        case "2":
+            Reports.showHighestAndLowest(system);
+            break;
+
+        case "3":
+            Reports.showStudentsSortedByGrade(system);
+            break;
+
+        case "4":
+            System.out.print("Enter subject name: ");
+            String reportSubject = scanner.nextLine();
+            Reports.showHighestAndLowest(system, reportSubject);
+            break;
+
+        default:
+            System.out.println("Invalid report option.");
+    }
+    break;
 
     case "6":
-        System.out.println("You chose to save students.");
-        break;
+    boolean saved = system.saveToFile("students.txt");
 
-    case "7":
-        System.out.println("You chose to load students.");
-        break;
+    if (saved) {
+        System.out.println("Students saved successfully!");
+    } else {
+        System.out.println("Failed to save students.");
+    }
+    break;
+
+   case "7":
+    boolean loaded = system.loadFromFile("students.txt");
+
+    if (loaded) {
+        System.out.println("Students loaded successfully!");
+    } else {
+        System.out.println("Failed to load students.");
+    }
+    break;
 
     case "0":
     System.out.println("Goodbye!");
