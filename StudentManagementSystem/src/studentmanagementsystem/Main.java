@@ -28,6 +28,7 @@ public static void main(String[] args) {
         System.out.println("5. Reports");
         System.out.println("6. Save Students");
         System.out.println("7. Load Students");
+        System.out.println("8. Update Student Name");
         System.out.println("0. Exit");
 
         System.out.print("Enter your choice: ");
@@ -172,6 +173,19 @@ try {
     }
     break;
 
+    case "8":
+        System.out.print("Enter student ID: ");
+        String updateId = scanner.nextLine();
+        System.out.print("Enter new name: ");
+        String newName = scanner.nextLine();
+        try{
+            system.updateStudentName(updateId, newName);
+            System.out.println("Name updated successfully!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        break;
+        
     case "0":
     System.out.println("Goodbye!");
     return;
